@@ -1,12 +1,39 @@
 #include <SPI.h>
 #include <Gamebuino.h>
 
+
+/*************MENU DECLARATION******************/
+#define MENULENGTH 4
+#define UNSELECTED -1
+#define STARTGAME 0
+#define HIGHSCORES 1
+#define OPTIONS 2
+#define CREDITS 3
+//1. Start Game
+//2. Highscores
+//3. Options
+//4. Credits
+const char strStartGame[] PROGMEM   = "Start game";
+const char strHighScores[] PROGMEM  = "Highscores";
+const char strOptions[] PROGMEM     = "Options";
+const char strCredits[] PROGMEM     = "Credits";
+
+const char* const menu[MENULENGTH] PROGMEM = {
+  strStartGame,
+  strHighScores,
+  strOptions,
+  strCredits, 
+};
+
+/*************GAMEBUINO OBJECT DECLARATION********************/
 Gamebuino gb;
 
+/*************INGAME CLASSES DEFINITION**********************/
 class Figure
 {
   virtual void draw() = 0;
 };
+
 
 class Circle: public Figure
 {
@@ -18,11 +45,13 @@ class Circle: public Figure
     int x_, y_, r_;
 };
 
+
 void Circle::draw()
 {
   gb.display.setColor(BLACK);
   gb.display.drawCircle(this->x_, this->y_, this->r_);
 }
+
 
 class CircleChar: public Circle
 {
@@ -34,6 +63,7 @@ class CircleChar: public Circle
     int char_;
 };
 
+
 void CircleChar::draw()
 {
   Circle::draw();
@@ -42,56 +72,71 @@ void CircleChar::draw()
 }
 
 
+/**************GAME LOGIC********************/
+CircleChar crArray[] = {CircleChar(8, 40, 5, '2'),
+                        CircleChar(20, 40, 5, '2'),
+                        CircleChar(32, 40, 5, '2'),
+                        CircleChar(44, 40, 5, '2'),
+                      };
+int crArrayCount = 4;
 
-void setGameTitle()
+void setup()
+{
+  Serial.begin(9600);//FOR DEBUGGING
+  gb.begin();
+  goToGameTitle();
+}
+
+void loop()
+{
+  switch(gb.menu(menu, MENULENGTH))
+  {
+    case UNSELECTED:
+      goToGameTitle();
+      break;
+    case STARTGAME:
+      game();
+      break;
+    case HIGHSCORES:
+      break;
+    case OPTIONS:
+      break;
+    case CREDITS:
+      break;
+    default:
+      break;
+  
+  }
+}
+
+void goToGameTitle()
 {
   gb.titleScreen(F("Mastermind"));
 }
 
-CircleChar crArray[] = {CircleChar(15, 15, 4, '1'),
-                        CircleChar(8, 40, 5, '2'),
-                        CircleChar(20, 40, 5, '2'),
-                        CircleChar(32, 40, 5, '2'),
-                        CircleChar(44, 40, 5, '2'),};
-int crArrayCount = 5;
-
-void setup()
-{
-  gb.begin();
-  setGameTitle();
-  crArray[0].draw();
-}
-
-void input()
-{
-  if(gb.buttons.pressed(BTN_C))
-  {
-    setGameTitle();
-  }
-}
-
-void update()
-{
-  
-}
-
 void draw()
 {
+  Serial.println(F("DRAWING"));
   for(int i = 0; i < crArrayCount; i++)
   {
+    
     crArray[i].draw();
   }
   
 }
 
-
-void loop()
+void game()
 {
-  if(gb.update())
+  boolean win = false;
+  while(win == false)
   {
-    input();
-    update();
-    draw();
+    if(gb.update())
+    {
+      draw();  
+    }
+    
   }
 }
+
+
 
