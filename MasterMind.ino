@@ -35,14 +35,19 @@ class Figure
 };
 
 
-class Circle: public Figure
+class Circle: 
+public Figure
 {
-  public:
-    Circle(): x_(0), y_(), r_(0){}
-    Circle(int x, int y, int r): x_(x), y_(y), r_(r){}
-    void draw();
-  protected:
-    int x_, y_, r_;
+public:
+  Circle(): 
+  x_(0), y_(), r_(0){
+  }
+  Circle(int x, int y, int r): 
+  x_(x), y_(y), r_(r){
+  }
+  void draw();
+protected:
+  int x_, y_, r_;
 };
 
 
@@ -53,14 +58,19 @@ void Circle::draw()
 }
 
 
-class CircleChar: public Circle
+class CircleChar: 
+public Circle
 {
-  public:
-    CircleChar(): Circle(), char_(0){}
-    CircleChar(int x, int y, int r, int chara): Circle(x, y, r), char_(chara){}
-    void draw();
-  private:
-    int char_;
+public:
+  CircleChar(): 
+  Circle(), char_(0){
+  }
+  CircleChar(int x, int y, int r, int chara): 
+  Circle(x, y, r), char_(chara){
+  }
+  void draw();
+private:
+  int char_;
 };
 
 
@@ -68,20 +78,21 @@ void CircleChar::draw()
 {
   Circle::draw();
   gb.display.drawChar(this->x_ - 1, this->y_ - 2, this->char_, 1);
-  
+
 }
 
 
 /**************GAME LOGIC********************/
-CircleChar crArray[] = {CircleChar(6 , 41, 4, '2'),
-                        CircleChar(18, 41, 4, '2'),
-                        CircleChar(30, 41, 4, '2'),
-                        CircleChar(42, 41, 4, '2'),
-                        CircleChar(54, 41, 4, '2'),
-                        CircleChar(6 , 29, 4, '2'),
-                        CircleChar(6 , 17, 4, '2'),
-                        CircleChar(6 , 5, 4, '2'),
-                      };
+CircleChar crArray[] = {
+  CircleChar(6 , 41, 4, '2'),
+  CircleChar(18, 41, 4, '2'),
+  CircleChar(30, 41, 4, '2'),
+  CircleChar(42, 41, 4, '2'),
+  CircleChar(54, 41, 4, '2'),
+  CircleChar(6 , 29, 4, '2'),
+  CircleChar(6 , 17, 4, '2'),
+  CircleChar(6 , 5, 4, '2'),
+};
 int crArrayCount = 8;
 
 void setup()
@@ -96,21 +107,21 @@ void loop()
 {
   switch(gb.menu(menu, MENULENGTH))
   {
-    case UNSELECTED:
-      goToGameTitle();
-      break;
-    case STARTGAME:
-      game();
-      break;
-    case HIGHSCORES:
-      break;
-    case OPTIONS:
-      break;
-    case CREDITS:
-      break;
-    default:
-      break;
-  
+  case UNSELECTED:
+    goToGameTitle();
+    break;
+  case STARTGAME:
+    game();
+    break;
+  case HIGHSCORES:
+    break;
+  case OPTIONS:
+    break;
+  case CREDITS:
+    break;
+  default:
+    break;
+
   }
 }
 
@@ -130,7 +141,74 @@ void game()
     {
       draw();  
     }
-    
+
+  }
+}
+
+void highscores()
+{
+  boolean exit = false;
+  while(exit == false)
+  {
+    if(gb.update())
+    {
+      switch(pressedButton())
+      {
+      case BTN_C:
+        exit=true;
+        break;
+      default:
+        break;
+
+      }
+
+    } 
+  }
+}
+
+void options()
+{
+
+}
+
+void credits()
+{
+
+}
+
+int pressedButton()
+{
+  if(gb.buttons.pressed(BTN_A))
+  {
+    return BTN_A; 
+  }
+  else if(gb.buttons.pressed(BTN_B))
+  {
+    return BTN_B;
+  }
+  else if(gb.buttons.pressed(BTN_C))
+  {
+    return BTN_C; 
+  }
+  else if(gb.buttons.pressed(BTN_UP))
+  {
+    return BTN_UP; 
+  }
+  else if(gb.buttons.pressed(BTN_DOWN))
+  {
+    return BTN_DOWN; 
+  }
+  else if(gb.buttons.pressed(BTN_LEFT))
+  {
+    return BTN_LEFT;
+  }
+  else if(gb.buttons.pressed(BTN_RIGHT))
+  {
+    return BTN_RIGHT;
+  }
+  else
+  {
+    return -1; 
   }
 }
 
@@ -140,12 +218,12 @@ void draw()
   Serial.println(F("DRAWING"));
   for(int i = 0; i < crArrayCount; i++)
   {
-    
+
     crArray[i].draw();
   }
   drawGameMesh();
   drawScores();
-  
+
 }
 
 void drawGameMesh()
@@ -168,5 +246,11 @@ void drawScores()
   gb.display.drawChar(77, 39, '?', 1);
   gb.display.drawChar(80, 39, '1', 1);
 }
+
+
+
+
+
+
 
 
