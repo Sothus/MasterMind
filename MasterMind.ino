@@ -114,6 +114,7 @@ void loop()
     game();
     break;
   case HIGHSCORES:
+    highscores();
     break;
   case OPTIONS:
     break;
@@ -148,13 +149,17 @@ void game()
 void highscores()
 {
   boolean exit = false;
+  Serial.println(F("BEGIN"));
   while(exit == false)
   {
+    Serial.println(F("WHILE"));
     if(gb.update())
     {
+      Serial.println(F("IF"));
       switch(pressedButton())
       {
       case BTN_C:
+        Serial.println(F("EXITING"));
         exit=true;
         break;
       default:
