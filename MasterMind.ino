@@ -182,8 +182,8 @@ void game()
 {
   boolean win = false;
   boolean exit = false;
-  
-  
+
+
   while(win == false && exit == false)
   {
     if(gb.update())
@@ -208,7 +208,7 @@ void game()
       default:
         break; 
       }
-      
+
       draw(); 
     }
 
@@ -222,27 +222,27 @@ void increaseNumberAtPos(int position)
   if(positionChar < 56)
   {
     positionChar++;
-     crArray[0][position].setChar(positionChar); 
+    crArray[0][position].setChar(positionChar); 
   }
 }
 
 void decreaseNumberAtPos(int position)
 {
-    int positionChar = crArray[0][position].getChar();
+  int positionChar = crArray[0][position].getChar();
   Serial.print(positionChar);
   if(positionChar > 48)
   {
     positionChar--;
-     crArray[0][position].setChar(positionChar); 
+    crArray[0][position].setChar(positionChar); 
   }
-  
+
 }
 
 void moveCursorLeft()
 {
   if(cursor > 0)
   {
-     cursor--; 
+    cursor--; 
   }
 }
 
@@ -250,7 +250,7 @@ void moveCursorRight()
 {
   if(cursor < 4)
   {
-     cursor++; 
+    cursor++; 
   }
 }
 
@@ -410,6 +410,7 @@ int pressedButton()
     return -1; 
   }
 }
+
 
 
 
