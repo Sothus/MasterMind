@@ -46,6 +46,9 @@ public:
   x_(x), y_(y), r_(r){
   }
   void draw();
+  int x();
+  int y();
+  int r();
 protected:
   int x_, y_, r_;
 };
@@ -55,6 +58,21 @@ void Circle::draw()
 {
   gb.display.setColor(BLACK);
   gb.display.drawCircle(this->x_, this->y_, this->r_);
+}
+
+int Circle::x()
+{
+  return this->x_; 
+}
+
+int Circle::y()
+{
+  return this->y_; 
+}
+
+int Circle::r()
+{
+  return this->r_; 
 }
 
 
@@ -69,31 +87,56 @@ public:
   Circle(x, y, r), char_(chara){
   }
   void draw();
+  int getChar();
+  void setChar(int char_);
 private:
   int char_;
 };
-
 
 void CircleChar::draw()
 {
   Circle::draw();
   gb.display.drawChar(this->x_ - 1, this->y_ - 2, this->char_, 1);
+}
 
+int CircleChar::getChar()
+{
+  return this->char_; 
+}
+
+void CircleChar::setChar(int char_)
+{
+  this->char_ = char_; 
 }
 
 
 /**************GAME LOGIC********************/
-CircleChar crArray[] = {
-  CircleChar(6 , 41, 4, '2'),
-  CircleChar(18, 41, 4, '2'),
-  CircleChar(30, 41, 4, '2'),
-  CircleChar(42, 41, 4, '2'),
-  CircleChar(54, 41, 4, '2'),
-  CircleChar(6 , 29, 4, '2'),
-  CircleChar(6 , 17, 4, '2'),
-  CircleChar(6 , 5, 4, '2'),
+#define crRows 4
+#define crColumns 5
+
+CircleChar crArray[crRows][crColumns] = {
+  {
+    CircleChar(6 , 41, 4, '0'),
+    CircleChar(18, 41, 4, '2'),
+    CircleChar(30, 41, 4, '2'),
+    CircleChar(42, 41, 4, '2'),
+    CircleChar(54, 41, 4, '9'),
+  }
+  ,
+  {  
+    CircleChar(6 , 29, 4, '2'),
+
+  }
+  ,
+  {  
+    CircleChar(6 , 17, 4, '2'),
+  }
+  ,
+  {  
+    CircleChar(6 , 5, 4, '2'),  
+  }
 };
-int crArrayCount = 8;
+
 
 void setup()
 {
@@ -132,19 +175,136 @@ void goToGameTitle()
   gb.titleScreen(F("Mastermind"));
 }
 
+/***********GAME_BLOCK***************/
+int cursor = 0;
 
 void game()
 {
   boolean win = false;
-  while(win == false)
+  boolean exit = false;
+  
+  
+  while(win == false && exit == false)
   {
     if(gb.update())
     {
-      draw();  
+      switch(pressedButton())
+      {
+      case BTN_C:
+        exit = true;
+        break;
+      case BTN_LEFT:
+        moveCursorLeft();
+        break;
+      case BTN_RIGHT:
+        moveCursorRight();
+        break;
+      case BTN_UP:
+        increaseNumberAtPos(cursor);
+        break;
+      case BTN_DOWN:
+        decreaseNumberAtPos(cursor);
+        break;
+      default:
+        break; 
+      }
+      
+      draw(); 
     }
 
   }
 }
+
+void increaseNumberAtPos(int position)
+{
+  int positionChar = crArray[0][position].getChar();
+  Serial.print(positionChar);
+  if(positionChar < 56)
+  {
+    positionChar++;
+     crArray[0][position].setChar(positionChar); 
+  }
+}
+
+void decreaseNumberAtPos(int position)
+{
+    int positionChar = crArray[0][position].getChar();
+  Serial.print(positionChar);
+  if(positionChar > 48)
+  {
+    positionChar--;
+     crArray[0][position].setChar(positionChar); 
+  }
+  
+}
+
+void moveCursorLeft()
+{
+  if(cursor > 0)
+  {
+     cursor--; 
+  }
+}
+
+void moveCursorRight()
+{
+  if(cursor < 4)
+  {
+     cursor++; 
+  }
+}
+
+
+//84x48 
+void draw()
+{
+  //Serial.println(F("DRAWING"));
+  for(int i = 0; i < crRows; i++)
+  {
+    for(int j = 0; j < crColumns; j++)
+    {
+      crArray[i][j].draw();
+    }
+
+
+  }
+  drawCursor();
+  drawGameMesh();
+  drawScores();
+
+}
+
+void drawCursor()
+{
+  int x_pos = crArray[0][0].x();
+  int y_pos = crArray[0][0].y();
+  int delta = crArray[0][1].x() - x_pos;
+  Circle cursorCircle(x_pos + (cursor * delta), y_pos, 5);
+  cursorCircle.draw();
+}
+
+void drawGameMesh()
+{
+  //Serial.println(F("DRAWING MESH"));
+  gb.display.setColor(GRAY);
+  gb.display.drawFastHLine(0, 35, 84);
+  gb.display.drawFastHLine(0, 23, 84);
+  gb.display.drawFastHLine(0, 11, 84);
+  gb.display.drawFastVLine(60, 0, 48);
+}
+
+void drawScores()
+{
+  gb.display.setColor(BLACK);
+  gb.display.drawChar(62, 39, '+', 1);
+  gb.display.drawChar(65, 39, '1', 1);
+  gb.display.drawChar(69, 39, '-', 1);
+  gb.display.drawChar(72, 39, '1', 1);
+  gb.display.drawChar(77, 39, '?', 1);
+  gb.display.drawChar(80, 39, '1', 1);
+}
+
+/*************HIGHSCORES_BLOCK*************/
 
 void highscores()
 {
@@ -171,15 +331,49 @@ void highscores()
   }
 }
 
+/***********OPTIONS_BLOCK*************/
+
 void options()
 {
-
+  boolean exit = false;
+  while(exit == false)
+  {
+    if(gb.update())
+    {
+      switch(pressedButton())
+      {
+      case BTN_C:
+        exit = true;
+        break;
+      default:
+        break;
+      }
+    } 
+  }
 }
 
+/************CREDITS_BLOCK*******************/
 void credits()
 {
+  boolean exit = false;
+  while(exit == false)
+  {
+    if(gb.update())
+    {
+      switch(pressedButton())
+      {
+      case BTN_C:
+        exit = true;
+        break;
+      default:
+        break;
+      }
+    } 
+  }
 
 }
+
+/********UTILS_BLOCK**********/
 
 int pressedButton()
 {
@@ -217,40 +411,8 @@ int pressedButton()
   }
 }
 
-//84x48 
-void draw()
-{
-  Serial.println(F("DRAWING"));
-  for(int i = 0; i < crArrayCount; i++)
-  {
 
-    crArray[i].draw();
-  }
-  drawGameMesh();
-  drawScores();
 
-}
-
-void drawGameMesh()
-{
-  Serial.println(F("DRAWING MESH"));
-  gb.display.setColor(GRAY);
-  gb.display.drawFastHLine(0, 35, 84);
-  gb.display.drawFastHLine(0, 23, 84);
-  gb.display.drawFastHLine(0, 11, 84);
-  gb.display.drawFastVLine(60, 0, 48);
-}
-
-void drawScores()
-{
-  gb.display.setColor(BLACK);
-  gb.display.drawChar(62, 39, '+', 1);
-  gb.display.drawChar(65, 39, '1', 1);
-  gb.display.drawChar(69, 39, '-', 1);
-  gb.display.drawChar(72, 39, '1', 1);
-  gb.display.drawChar(77, 39, '?', 1);
-  gb.display.drawChar(80, 39, '1', 1);
-}
 
 
 
